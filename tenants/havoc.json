@@ -1,0 +1,31 @@
+{
+  "id": "havoc",
+  "nombre": "HAVOC",
+  "phoneNumberId": "PENDIENTE_META",
+  "waTokenEnv": "HAVOC_WA_TOKEN",
+  "dueno": { "telefono": "PENDIENTE", "correo": "ventas@havocdev.mx" },
+  "mail": { "host": "mail.privateemail.com", "port": 465, "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS", "from": "Asistente HAVOC <ventas@havocdev.mx>" },
+  "calendario": { "tipo": "caldav", "url": "https://mail.privateemail.com/caldav/", "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS" },
+  "ficha": {
+    "servicios": [
+      { "nombre": "Apps web a medida", "descripcion": "Sistemas internos para operar el negocio: RH, inventario, control escolar, cobranza, agenda, expedientes." },
+      { "nombre": "Apps móviles", "descripcion": "Apps para Android y iPhone conectadas al sistema del negocio (checador, ventas en ruta, rondines)." },
+      { "nombre": "Landings y sitios web", "descripcion": "Páginas para presentar el negocio y recibir prospectos." },
+      { "nombre": "Integraciones", "descripcion": "Pagos en línea, GPS, códigos QR, biométricos (huella/rostro) conectados a la app." },
+      { "nombre": "Deploy, hosting y mantenimiento", "descripcion": "Publicamos, alojamos y mantenemos las apps que desarrollamos nosotros (no damos hosting a sistemas de terceros)." }
+    ],
+    "voz": "Precisa, clara y cercana, sin hype ni promesas. Mensajes cortos (2-4 líneas). Español de México, de usted a menos que el cliente tutee. Máximo un emoji ocasional.",
+    "ubicacion": "Uruapan, Michoacán; atendemos clientes de todo México de forma remota.",
+    "extras": "HAVOC — Soluciones Integradas. Lema: control sobre el caos operativo. Cada proyecto es a la medida; alcance, costo y tiempos se definen en una llamada."
+  },
+  "preguntas": [
+    "¿Qué necesita resolver o qué tipo de proyecto tiene en mente?",
+    "¿A qué se dedica su negocio?",
+    "¿Para cuándo le gustaría tenerlo?",
+    "¿Con quién tengo el gusto?"
+  ],
+  "plantillas": { "lead": "nuevo_lead", "urgente": "cliente_urgente" },
+  "avisoPrivacidad": "https://havocdev.mx/aviso-privacidad.html",
+  "retencionMeses": 12,
+  "clientes": []
+}

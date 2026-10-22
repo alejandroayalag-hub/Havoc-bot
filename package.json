@@ -1,0 +1,19 @@
+{
+  "name": "havoc-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.1.0",
+    "express": "^5.3.0",
+    "nodemailer": "^10.2.1",
+    "tsdav": "^2.5.0"
+  }
+}

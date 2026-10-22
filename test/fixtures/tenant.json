@@ -1,0 +1,14 @@
+{
+  "id": "demo",
+  "nombre": "Demo",
+  "phoneNumberId": "111",
+  "waTokenEnv": "DEMO_WA_TOKEN",
+  "dueno": { "telefono": "4521112222", "correo": "dueno@demo.mx" },
+  "mail": { "host": "mail.example.com", "port": 465, "user": "ventas@demo.mx", "passEnv": "DEMO_MAIL_PASS", "from": "Demo <ventas@demo.mx>" },
+  "calendario": { "tipo": "caldav", "url": "https://cal.example.com/", "user": "ventas@demo.mx", "passEnv": "DEMO_MAIL_PASS" },
+  "ficha": { "servicios": [{ "nombre": "Apps", "descripcion": "Apps web" }], "voz": "precisa", "ubicacion": "Uruapan" },
+  "preguntas": ["¿Qué necesitas?"],
+  "plantillas": { "lead": "nuevo_lead", "urgente": "cliente_urgente" },
+  "avisoPrivacidad": "https://demo.mx/aviso",
+  "clientes": [{ "empresa": "Gioval", "telefonos": ["+52 452 333 4444"] }]
+}
