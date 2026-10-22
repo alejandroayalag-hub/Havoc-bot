@@ -17,7 +17,8 @@ function icsDate(line) {
 }
 
 export function parseIcsTimes(ics) {
-  const lines = ics.replace(/\r\n[ \t]/g, '').split(/\r?\n/);
+  const all = ics.replace(/\r\n[ \t]/g, '').split(/\r?\n/);
+  const lines = all.slice(all.indexOf('BEGIN:VEVENT') + 1); // ignora DTSTART de VTIMEZONE
   const start = icsDate(lines.find(l => l.startsWith('DTSTART')) ?? '');
   const endLine = lines.find(l => l.startsWith('DTEND'));
   const end = endLine ? icsDate(endLine) : start && new Date(start.getTime() + 3600e3);
@@ -27,7 +28,13 @@ export function parseIcsTimes(ics) {
 const utc = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 const esc = s => String(s).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1');
 
-export function createCalendar(cfg, factory = defaultFactory) {
+function withTimeout(p, ms) {
+  let t;
+  const timer = new Promise((_, rej) => { t = setTimeout(() => rej(new Error(`CalDAV timeout ${ms} ms`)), ms); });
+  return Promise.race([p, timer]).finally(() => clearTimeout(t));
+}
+
+export function createCalendar(cfg, factory = defaultFactory, { timeoutMs = 15000 } = {}) {
   let ctx;
   async function calendar() {
     if (!ctx) {
@@ -41,17 +48,17 @@ export function createCalendar(cfg, factory = defaultFactory) {
   }
   return {
     async busy(from, to) {
-      const { client, cal } = await calendar();
-      const objs = await client.fetchCalendarObjects({ calendar: cal, timeRange: { start: from.toISOString(), end: to.toISOString() } });
+      const { client, cal } = await withTimeout(calendar(), timeoutMs);
+      const objs = await withTimeout(client.fetchCalendarObjects({ calendar: cal, timeRange: { start: from.toISOString(), end: to.toISOString() } }), timeoutMs);
       return objs.map(o => parseIcsTimes(o.data ?? '')).filter(Boolean);
     },
     async createEvent({ start, end, title, description }) {
-      const { client, cal } = await calendar();
+      const { client, cal } = await withTimeout(calendar(), timeoutMs);
       const uid = randomUUID();
       const iCalString = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//HAVOC//bot//ES', 'BEGIN:VEVENT',
         `UID:${uid}`, `DTSTAMP:${utc(new Date())}`, `DTSTART:${utc(start)}`, `DTEND:${utc(end)}`,
         `SUMMARY:${esc(title)}`, `DESCRIPTION:${esc(description)}`, 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n');
-      const res = await client.createCalendarObject({ calendar: cal, filename: `${uid}.ics`, iCalString });
+      const res = await withTimeout(client.createCalendarObject({ calendar: cal, filename: `${uid}.ics`, iCalString }), timeoutMs);
       if (res && res.ok === false) throw new Error(`CalDAV: no se pudo crear evento (${res.status})`);
     },
   };

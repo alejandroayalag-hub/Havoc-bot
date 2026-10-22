@@ -112,3 +112,32 @@ test('system prompt incluye texto de robot verbatim, servicios y fecha', () => {
   for (const s of tenant.ficha.servicios) assert.ok(p.includes(s.nombre));
   assert.match(p, /lunes 26 de octubre/);
 });
+
+test('agendar_llamada acepta hora local sin offset (-06:00)', async () => {
+  const s = setup([toolUse('agendar_llamada', { iso: '2026-10-26T11:00' }), text('ok')]);
+  await runAgent({ tenant, lead: s.lead, history: s.history, deps: s.deps });
+  assert.equal(s.events.length, 1);
+  assert.equal(s.events[0].start.toISOString(), SLOT);
+});
+
+test('system prompt incluye el año', () => {
+  assert.match(buildSystemPrompt(tenant, now), /26 de octubre de 2026/);
+});
+
+test('si falla el aviso tras agendar, la herramienta igual responde ok', async () => {
+  const s = setup([toolUse('agendar_llamada', { iso: SLOT }), text('ok')]);
+  s.deps.notifier.notify = async () => { throw new Error('todo caído'); };
+  await runAgent({ tenant, lead: s.lead, history: s.history, deps: s.deps });
+  const r = s.deps.llm.calls[1].messages.at(-1).content[0];
+  assert.equal(r.is_error, undefined);
+  assert.equal(JSON.parse(r.content).ok, true);
+});
+
+test('herramienta que lanza (CalDAV caído) avisa error al dueño', async () => {
+  const s = setup([toolUse('consultar_horarios', {}), text('ok')]);
+  s.deps.calendar.busy = async () => { throw new Error('CalDAV 503'); };
+  await runAgent({ tenant, lead: s.lead, history: s.history, deps: s.deps });
+  assert.equal(s.deps.llm.calls[1].messages.at(-1).content[0].is_error, true);
+  assert.equal(s.notes[0][1], 'error');
+  assert.match(s.notes[0][4], /CalDAV 503/);
+});

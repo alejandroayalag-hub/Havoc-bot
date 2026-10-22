@@ -32,5 +32,5 @@ ${tenant.preguntas.map(p => `- ${p}`).join('\n')}
 - Voz: ${f.voz}
 - Mensajes cortos para WhatsApp. Sin markdown, sin listas largas.
 
-Fecha y hora actual: ${formatSlot(now)} (hora del centro de México).`;
+Fecha y hora actual: ${formatSlot(now).replace(',', ` de ${new Date(now.getTime() - 6 * 3600e3).getUTCFullYear()},`)} (hora del centro de México).`;
 }

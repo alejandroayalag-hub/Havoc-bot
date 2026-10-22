@@ -35,6 +35,7 @@ export function createWhatsApp(fetchFn = fetch) {
       method: 'POST',
       headers: { Authorization: `Bearer ${tenant.waToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ messaging_product: 'whatsapp', ...payload }),
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) throw new Error(`WhatsApp ${res.status}: ${await res.text()}`);
     return res.json();

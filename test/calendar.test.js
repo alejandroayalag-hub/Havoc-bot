@@ -45,3 +45,17 @@ test('createEvent manda ICS con SUMMARY y horas UTC', async () => {
   assert.match(o.iCalString, /DTEND:20261026T173000Z/);
   assert.match(o.iCalString, /DESCRIPTION:Tel 52\\nquiere app/);
 });
+
+test('parseIcsTimes ignora DTSTART de VTIMEZONE', () => {
+  const ics = ['BEGIN:VCALENDAR', 'BEGIN:VTIMEZONE', 'TZID:America/Mexico_City', 'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:-0600', 'TZOFFSETTO:-0600', 'END:STANDARD', 'END:VTIMEZONE',
+    'BEGIN:VEVENT', 'UID:y', 'DTSTART;TZID=America/Mexico_City:20261030T120000', 'DTEND;TZID=America/Mexico_City:20261030T130000', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  assert.deepEqual(parseIcsTimes(ics), { start: new Date('2026-10-30T18:00:00Z'), end: new Date('2026-10-30T19:00:00Z') });
+});
+
+test('busy se corta por timeout si CalDAV no responde', async () => {
+  const cal = createCalendar({ url: 'x', user: 'u', pass: 'p' }, async () => ({
+    fetchCalendars: async () => [{ url: 'u1' }],
+    fetchCalendarObjects: () => new Promise(() => {}),
+  }), { timeoutMs: 50 });
+  await assert.rejects(cal.busy(new Date(), new Date()), /timeout/i);
+});

@@ -59,3 +59,10 @@ test('error HTTP lanza con el detalle', async () => {
   const wa = createWhatsApp(async () => ({ ok: false, status: 400, text: async () => 'bad token' }));
   await assert.rejects(wa.sendText(tenant, '52', 'x'), /400.*bad token/);
 });
+
+test('las llamadas a Graph llevan señal de timeout', async () => {
+  let signal;
+  const wa = createWhatsApp(async (url, opts) => { signal = opts.signal; return { ok: true, status: 200, json: async () => ({}) }; });
+  await wa.sendText(tenant, '52', 'x');
+  assert.ok(signal instanceof AbortSignal);
+});

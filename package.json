@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "TZ=UTC node --test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.1.0",

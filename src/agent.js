@@ -20,7 +20,7 @@ const TOOLS = [
     input_schema: obj({ nombre: str('Nombre de la persona'), necesidad: str('Qué necesita, en una línea'), negocio: str('Giro o nombre del negocio'), urgencia: str('Para cuándo lo quiere') }) },
   { name: 'consultar_horarios', description: 'Devuelve horarios libres para una llamada de 30 minutos.', input_schema: obj({}) },
   { name: 'agendar_llamada', description: 'Agenda la llamada en el horario elegido (usar el iso que devolvió consultar_horarios).',
-    input_schema: obj({ iso: str('Inicio en ISO 8601 tal como vino de consultar_horarios') }, ['iso']) },
+    input_schema: obj({ iso: str('Inicio: el iso de consultar_horarios, o fecha y hora de México como 2026-10-27T11:00') }, ['iso']) },
   { name: 'cerrar_sin_llamada', description: 'El prospecto no quiere llamada; cierra la conversación.', input_schema: obj({}) },
   { name: 'solicitar_cambio', description: 'El prospecto quiere mover o cancelar su llamada; avisa al equipo.',
     input_schema: obj({ detalle: str('Qué pidió exactamente') }, ['detalle']) },
@@ -28,7 +28,7 @@ const TOOLS = [
     input_schema: obj({ empresa: str('Empresa del cliente') }, ['empresa']) },
 ].map(t => ({ ...t, strict: true }));
 
-export function createLlm(client = new Anthropic()) {
+export function createLlm(client = new Anthropic({ timeout: 60_000, maxRetries: 1 })) {
   return {
     create: params => client.beta.messages.create({
       ...params, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
@@ -52,7 +52,7 @@ async function ejecutar(name, input, { tenant, lead, history, deps }) {
     case 'consultar_horarios':
       return { opciones: await opciones(tenant, deps) };
     case 'agendar_llamada': {
-      const start = new Date(input.iso);
+      const start = new Date(/(Z|[+-]\d{2}:?\d{2})$/.test(input.iso) ? input.iso : `${input.iso}-06:00`);
       if (isNaN(start) || !enHorario(start, deps.now, tenant.horario)) return { error: 'fuera_de_horario', opciones: await opciones(tenant, deps) };
       const end = new Date(start.getTime() + tenant.horario.bloqueMin * 60e3);
       if (!(await isFree(deps.calendar, start, end))) return { error: 'ocupado', opciones: await opciones(tenant, deps) };
@@ -62,7 +62,7 @@ async function ejecutar(name, input, { tenant, lead, history, deps }) {
         description: `Teléfono: ${l.phone}\nNecesidad: ${l.necesidad ?? '—'}\nNegocio: ${l.negocio ?? '—'}\nUrgencia: ${l.urgencia ?? '—'}`,
       });
       updateLead(deps.db, lead.id, { estado: 'agendado', llamada_inicio: start.toISOString() });
-      await deps.notifier.notify(tenant, 'lead', actual(), history);
+      await deps.notifier.notify(tenant, 'lead', actual(), history).catch(e => console.error('notify lead:', e.message));
       return { ok: true, agendada: formatSlot(start) };
     }
     case 'cerrar_sin_llamada': {
@@ -99,6 +99,8 @@ export async function runAgent({ tenant, lead, history, deps }) {
         results.push({ type: 'tool_result', tool_use_id: b.id, content: JSON.stringify(await ejecutar(b.name, b.input, { tenant, lead, history, deps })) });
       } catch (e) {
         results.push({ type: 'tool_result', tool_use_id: b.id, is_error: true, content: e.message });
+        await deps.notifier.notify(tenant, 'error', getLead(deps.db, tenant.id, lead.phone), history, `${b.name}: ${e.message}`)
+          .catch(err => console.error('notify error:', err.message));
       }
     }
     messages.push({ role: 'user', content: results });
