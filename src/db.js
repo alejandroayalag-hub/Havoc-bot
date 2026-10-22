@@ -61,7 +61,8 @@ export const findCliente = (db, tenantId, phone) =>
 export const inactiveLeads = (db, beforeIso) =>
   db.prepare("SELECT * FROM leads WHERE estado = 'abierto' AND ultima_actividad < ?").all(beforeIso);
 
-export function purge(db, beforeIso) {
+export function purge(db, beforeIso, tenantId) {
   db.prepare('DELETE FROM procesados WHERE creado < ?').run(beforeIso);
+  if (tenantId) return db.prepare("DELETE FROM leads WHERE tenant_id = ? AND estado != 'abierto' AND ultima_actividad < ?").run(tenantId, beforeIso).changes;
   return db.prepare("DELETE FROM leads WHERE estado != 'abierto' AND ultima_actividad < ?").run(beforeIso).changes;
 }
