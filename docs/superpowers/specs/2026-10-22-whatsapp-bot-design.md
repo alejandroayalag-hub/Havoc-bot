@@ -125,7 +125,7 @@ usan **plantillas aprobadas por Meta** (`nuevo_lead`, `cliente_urgente`) con var
 
 ## Pendiente del usuario (no bloquea escribir código)
 
-- Crear/usar Meta Business Manager + app WhatsApp, registrar el número 4521741368.
+- Crear/usar Meta Business Manager + app WhatsApp, registrar el número 4521741567 (antes 4521741368).
 - DNS A `bot` → 62.238.3.136 en Namecheap.
 - Contraseña de ventas@havocdev.mx (SMTP + CalDAV).
 - Revisar y aprobar el texto del aviso de privacidad.
