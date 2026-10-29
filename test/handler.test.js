@@ -4,7 +4,7 @@ import { handleMessage, TEXTOS } from '../src/handler.js';
 import { openDb, getLead, syncClientes, updateLead, recentMessages } from '../src/db.js';
 
 const tenant = { id: 'havoc', nombre: 'HAVOC', phoneNumberId: '111', dueno: { telefono: '524521112222' }, avisoPrivacidad: 'https://havocdev.mx/aviso-privacidad.html' };
-const AVISO = 'Aviso de privacidad: https://havocdev.mx/aviso-privacidad.html';
+const AVISO = 'Te dejo nuestro aviso de privacidad: https://havocdev.mx/aviso-privacidad.html';
 
 function setup({ agentFails = false } = {}) {
   const db = openDb(':memory:');
@@ -42,13 +42,14 @@ test('dueño escribiendo → texto fijo, sin agente ni lead', async () => {
   assert.equal(getLead(s.db, 'havoc', '524521112222'), undefined);
 });
 
-test('primer mensaje lleva aviso de privacidad; el segundo no', async () => {
+test('saludo limpio; aviso de privacidad solo en la segunda respuesta', async () => {
   const s = setup();
   await handleMessage(msg(), s.deps);
   await handleMessage(msg({ text: 'quiero una app' }), s.deps);
-  assert.equal(s.sent[0].text, `Hola, ¿en qué le ayudo?\n\n${AVISO}`);
-  assert.equal(s.sent[1].text, 'Hola, ¿en qué le ayudo?');
-  assert.deepEqual(s.agentCalls[1].history.map(m => m.content), ['Hola', `Hola, ¿en qué le ayudo?\n\n${AVISO}`, 'quiero una app']);
+  await handleMessage(msg({ text: 'para mi tienda' }), s.deps);
+  assert.equal(s.sent[0].text, 'Hola, ¿en qué le ayudo?');
+  assert.equal(s.sent[1].text, `Hola, ¿en qué le ayudo?\n\n${AVISO}`);
+  assert.equal(s.sent[2].text, 'Hola, ¿en qué le ayudo?');
 });
 
 test('no-texto → texto fijo sin agente', async () => {
@@ -104,5 +105,7 @@ test('si falla el aviso tras responder, el link de privacidad no se repite', asy
   syncClientes(s.db, 'havoc', [{ empresa: 'Gioval', telefonos: ['524523334444'] }]);
   s.deps.notifier.notify = async (t, kind) => { if (kind === 'urgente') throw new Error('smtp+wa caídos'); };
   await handleMessage(msg(), s.deps);
-  assert.equal(s.sent.filter(x => x.text.includes('Aviso de privacidad')).length, 1);
+  await handleMessage(msg({ text: 'sigue caído' }), s.deps);
+  await handleMessage(msg({ text: '¿ya?' }), s.deps);
+  assert.equal(s.sent.filter(x => x.text.includes('aviso de privacidad')).length, 1);
 });

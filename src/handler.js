@@ -3,9 +3,9 @@ import { guardPrice } from './agent.js';
 
 export const TEXTOS = {
   dueno: 'Este es el número del asistente; los avisos llegan aquí.',
-  noTexto: 'Por ahora solo puedo leer mensajes de texto. ¿Me escribe lo que necesita?',
-  cliente: 'Ya avisé al equipo, le contactan en breve.',
-  error: 'Tuvimos un problema técnico; ya avisé al equipo y le contactamos en breve.',
+  noTexto: 'Por ahora solo puedo leer mensajes de texto, ¿me escribes lo que necesitas?',
+  cliente: 'Ya le avisé al equipo, te contactan en breve.',
+  error: 'Tuvimos un problema técnico, ya le avisé al equipo y te contactamos en breve.',
 };
 
 export async function handleMessage(msg, deps) {
@@ -25,8 +25,9 @@ export async function handleMessage(msg, deps) {
 
   async function reply(text) {
     let out = text;
-    if (!lead.aviso_privacidad_enviado) {
-      out += `\n\nAviso de privacidad: ${tenant.avisoPrivacidad}`;
+    // El saludo va limpio, como lo escribiría una persona; el aviso va en la segunda respuesta, antes de pedir datos.
+    if (!lead.aviso_privacidad_enviado && recentMessages(deps.db, lead.id).some(m => m.role === 'assistant')) {
+      out += `\n\nTe dejo nuestro aviso de privacidad: ${tenant.avisoPrivacidad}`;
       updateLead(deps.db, lead.id, { aviso_privacidad_enviado: 1 });
       lead.aviso_privacidad_enviado = 1;
     }

@@ -14,14 +14,14 @@
       { "nombre": "Integraciones", "descripcion": "Pagos en línea, GPS, códigos QR, biométricos (huella/rostro) conectados a la app." },
       { "nombre": "Deploy, hosting y mantenimiento", "descripcion": "Publicamos, alojamos y mantenemos las apps que desarrollamos nosotros (no damos hosting a sistemas de terceros)." }
     ],
-    "voz": "Precisa, clara y cercana, sin hype ni promesas. Mensajes cortos (2-4 líneas). Español de México, de usted a menos que el cliente tutee. Máximo un emoji ocasional.",
+    "voz": "Como una persona del equipo de ventas escribiendo por WhatsApp: cálida, sencilla y directa, sin hype ni promesas. Mensajes de 1-2 líneas, una pregunta a la vez. Español de México, de tú (de usted solo si el cliente habla de usted). Sin signos de exclamación de más, sin emojis salvo que el cliente los use.",
     "ubicacion": "Uruapan, Michoacán; atendemos clientes de todo México de forma remota.",
     "extras": "HAVOC — Soluciones Integradas. Lema: control sobre el caos operativo. Cada proyecto es a la medida; alcance, costo y tiempos se definen en una llamada."
   },
   "preguntas": [
-    "¿Qué necesita resolver o qué tipo de proyecto tiene en mente?",
-    "¿A qué se dedica su negocio?",
-    "¿Para cuándo le gustaría tenerlo?",
+    "¿Qué necesitas resolver o qué proyecto tienes en mente?",
+    "¿A qué se dedica tu negocio?",
+    "¿Para cuándo te gustaría tenerlo?",
     "¿Con quién tengo el gusto?"
   ],
   "plantillas": { "lead": "nuevo_lead", "urgente": "cliente_urgente" },

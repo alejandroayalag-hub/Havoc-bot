@@ -6,8 +6,8 @@ import { getLead, updateLead } from './db.js';
 
 export const MODEL = 'claude-opus-5-5';
 const MAX_VUELTAS = 5;
-export const TEXTO_PRECIO = 'Cada proyecto es a la medida; costos y tiempos los vemos en una llamada de 30 minutos. ¿Le agendo una?';
-export const TEXTO_LLAMADA = 'Para atenderle mejor, lo vemos en una llamada de 30 minutos. ¿Le agendo una?';
+export const TEXTO_PRECIO = 'Cada proyecto es a la medida; costos y tiempos los vemos en una llamada de 30 minutos, ¿te agendo una?';
+export const TEXTO_LLAMADA = 'Para atenderte mejor, lo vemos en una llamada de 30 minutos, ¿te agendo una?';
 
 // ponytail: regex simple; ampliar con casos reales del log.
 const PRECIO = /\$\s?\d|\d+\s?(mil\b|pesos|mxn|usd|d[oó]lares)|\bsemanas?\b.*entrega|entrega.*\b(semanas?|d[ií]as|meses)\b/i;
