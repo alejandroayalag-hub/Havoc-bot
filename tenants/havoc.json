@@ -5,7 +5,7 @@
   "waTokenEnv": "HAVOC_WA_TOKEN",
   "dueno": { "telefono": "524521741368", "correo": "ventas@havocdev.mx" },
   "mail": { "host": "mail.privateemail.com", "port": 465, "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS", "from": "Asistente HAVOC <ventas@havocdev.mx>" },
-  "calendario": { "tipo": "caldav", "url": "https://mail.privateemail.com/caldav/", "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS" },
+  "calendario": { "tipo": "caldav", "url": "https://dav.privateemail.com/", "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS" },
   "ficha": {
     "servicios": [
       { "nombre": "Apps web a medida", "descripcion": "Sistemas internos para operar el negocio: RH, inventario, control escolar, cobranza, agenda, expedientes." },
