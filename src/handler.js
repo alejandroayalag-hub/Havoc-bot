@@ -1,6 +1,8 @@
 import { markSeen, getLead, createLead, updateLead, addMessage, recentMessages, findCliente } from './db.js';
 import { guardPrice } from './agent.js';
 
+export const PAUSA_MS = 2000;
+
 export const TEXTOS = {
   dueno: 'Este es el número del asistente; los avisos llegan aquí.',
   noTexto: 'Por ahora solo puedo leer mensajes de texto, ¿me escribes lo que necesitas?',
@@ -32,7 +34,14 @@ export async function handleMessage(msg, deps) {
       lead.aviso_privacidad_enviado = 1;
     }
     addMessage(deps.db, lead.id, 'assistant', out);
-    await deps.wa.sendText(tenant, msg.from, out);
+    // Cada párrafo sale como mensaje aparte, con pausa, como escribe una persona.
+    // ponytail: la cola del webhook es global, la pausa retrasa también otros chats; cola por número si hay volumen.
+    const sleep = deps.sleep ?? (ms => new Promise(r => setTimeout(r, ms)));
+    const partes = out.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    for (const [i, parte] of partes.entries()) {
+      if (i) await sleep(PAUSA_MS);
+      await deps.wa.sendText(tenant, msg.from, parte);
+    }
   }
 
   try {

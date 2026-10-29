@@ -13,7 +13,7 @@ function setup({ agentFails = false } = {}) {
     tenants: new Map([['111', tenant]]), db, now: () => new Date('2026-10-26T15:00:00Z'),
     wa: { sendText: async (t, to, text) => sent.push({ to, text }) },
     notifier: { notify: async (...a) => notes.push(a) },
-    calendars: new Map(), llm: {},
+    calendars: new Map(), llm: {}, sleep: async ms => sent.push({ pausa: ms }),
     runAgent: async args => { agentCalls.push(args); if (agentFails) throw new Error('claude 529'); return 'Hola, ¿en qué le ayudo?'; },
   };
   return { db, sent, notes, agentCalls, deps };
@@ -47,9 +47,14 @@ test('saludo limpio; aviso de privacidad solo en la segunda respuesta', async ()
   await handleMessage(msg(), s.deps);
   await handleMessage(msg({ text: 'quiero una app' }), s.deps);
   await handleMessage(msg({ text: 'para mi tienda' }), s.deps);
-  assert.equal(s.sent[0].text, 'Hola, ¿en qué le ayudo?');
-  assert.equal(s.sent[1].text, `Hola, ¿en qué le ayudo?\n\n${AVISO}`);
-  assert.equal(s.sent[2].text, 'Hola, ¿en qué le ayudo?');
+  assert.deepEqual(s.sent.map(x => x.text ?? x.pausa), ['Hola, ¿en qué le ayudo?', 'Hola, ¿en qué le ayudo?', 2000, AVISO, 'Hola, ¿en qué le ayudo?']);
+});
+
+test('párrafos → mensajes separados con pausa de 2 s', async () => {
+  const s = setup();
+  s.deps.runAgent = async () => 'Hola, ¿cómo estás?\n\n¿En qué podemos servirte?';
+  await handleMessage(msg(), s.deps);
+  assert.deepEqual(s.sent.map(x => x.text ?? x.pausa), ['Hola, ¿cómo estás?', 2000, '¿En qué podemos servirte?']);
 });
 
 test('no-texto → texto fijo sin agente', async () => {
@@ -107,5 +112,5 @@ test('si falla el aviso tras responder, el link de privacidad no se repite', asy
   await handleMessage(msg(), s.deps);
   await handleMessage(msg({ text: 'sigue caído' }), s.deps);
   await handleMessage(msg({ text: '¿ya?' }), s.deps);
-  assert.equal(s.sent.filter(x => x.text.includes('aviso de privacidad')).length, 1);
+  assert.equal(s.sent.filter(x => x.text?.includes('aviso de privacidad')).length, 1);
 });

@@ -6,7 +6,11 @@ export function buildSystemPrompt(tenant, now) {
   const f = tenant.ficha;
   return `Eres el asistente virtual de WhatsApp de ${tenant.nombre}. Atiendes el primer contacto de prospectos.
 Escribe como escribe una persona del equipo por WhatsApp: natural, breve, de tú, sin sonar a formulario ni a bot. No te presentes como asistente ni como IA a menos que te lo pregunten.
-Si el primer mensaje es solo un saludo, contesta solo con el saludo, por ejemplo: "Hola, ¿cómo estás? ¿En qué podemos servirte?".
+Cada párrafo (separado por una línea en blanco) se envía como un mensaje aparte; parte en 2 mensajes cortos cuando una persona lo haría.
+Si el primer mensaje es solo un saludo, contesta solo con el saludo en dos mensajes, exactamente así:
+Hola, ¿cómo estás?
+
+¿En qué podemos servirte?
 
 # Lo que sabes (y NADA más)
 ${f.extras ?? ''}
