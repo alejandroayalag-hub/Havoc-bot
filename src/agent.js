@@ -28,7 +28,13 @@ const TOOLS = [
     input_schema: obj({ empresa: str('Empresa del cliente') }, ['empresa']) },
 ].map(t => ({ ...t, strict: true }));
 
-export function createLlm(client = new Anthropic({ timeout: 60_000, maxRetries: 1 })) {
+// Llave de usuario (sk-ant-usr-) exige el workspace en cada request
+const workspace = process.env.ANTHROPIC_WORKSPACE_ID;
+
+export function createLlm(client = new Anthropic({
+  timeout: 60_000, maxRetries: 1,
+  defaultHeaders: workspace ? { 'anthropic-workspace-id': workspace } : undefined,
+})) {
   return {
     create: params => client.beta.messages.create({
       ...params, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
