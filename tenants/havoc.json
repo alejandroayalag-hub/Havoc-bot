@@ -4,7 +4,7 @@
   "phoneNumberId": "1373906909147531",
   "waTokenEnv": "HAVOC_WA_TOKEN",
   "dueno": { "telefono": "524521741368", "correo": "ventas@havocdev.mx" },
-  "mail": { "host": "mail.privateemail.com", "port": 465, "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS", "from": "Asistente HAVOC <ventas@havocdev.mx>" },
+  "mail": { "host": "mail.privateemail.com", "port": 587, "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS", "from": "Asistente HAVOC <ventas@havocdev.mx>" },
   "calendario": { "tipo": "caldav", "url": "https://dav.privateemail.com/", "user": "ventas@havocdev.mx", "passEnv": "HAVOC_MAIL_PASS" },
   "ficha": {
     "servicios": [
