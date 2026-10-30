@@ -58,6 +58,9 @@ async function ejecutar(name, input, { tenant, lead, history, deps }) {
     case 'consultar_horarios':
       return { opciones: await opciones(tenant, deps) };
     case 'agendar_llamada': {
+      // Una llamada pendiente por lead; mover o cancelar la gestiona una persona.
+      const previa = actual().llamada_inicio && new Date(actual().llamada_inicio);
+      if (previa > deps.now) return { error: 'ya_agendada', llamada: formatSlot(previa), indicacion: 'Si quiere moverla usa solicitar_cambio.' };
       const start = new Date(/(Z|[+-]\d{2}:?\d{2})$/.test(input.iso) ? input.iso : `${input.iso}-06:00`);
       if (isNaN(start) || !enHorario(start, deps.now, tenant.horario)) return { error: 'fuera_de_horario', opciones: await opciones(tenant, deps) };
       const end = new Date(start.getTime() + tenant.horario.bloqueMin * 60e3);

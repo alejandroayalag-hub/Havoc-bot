@@ -72,6 +72,13 @@ test('agendar_llamada libre crea evento, marca agendado y avisa una vez', async 
   assert.equal(s.notes[0][2].nombre, 'Ana');
 });
 
+test('agendar_llamada con llamada pendiente no crea otro evento', async () => {
+  const s = setup([toolUse('agendar_llamada', { iso: SLOT }), toolUse('agendar_llamada', { iso: '2026-10-26T18:00:00.000Z' }), text('ok')]);
+  await runAgent({ tenant, lead: s.lead, history: s.history, deps: s.deps });
+  assert.equal(s.events.length, 1);
+  assert.equal(JSON.parse(s.deps.llm.calls[2].messages.at(-1).content[0].content).error, 'ya_agendada');
+});
+
 test('cerrar_sin_llamada avisa solo si hay datos útiles', async () => {
   const s = setup([toolUse('cerrar_sin_llamada', {}), text('ok')]);
   await runAgent({ tenant, lead: s.lead, history: s.history, deps: s.deps });
